@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://qingkanc.github.io</id>
     <title>青栞</title>
-    <updated>2021-03-30T06:11:14.573Z</updated>
+    <updated>2021-03-30T06:13:44.957Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://qingkanc.github.io"/>
     <link rel="self" href="https://qingkanc.github.io/atom.xml"/>
@@ -17,28 +17,28 @@
         </link>
         <updated>2021-03-26T05:49:14.000Z</updated>
         <content type="html"><![CDATA[<!-- more -->
-<p>API<br>
-#搜索</p>
+<p>API</p>
+<h1 id="搜索">搜索</h1>
 <p>brew search xxx</p>
-<p>#安装<br>
-brew install xxx</p>
-<p>#卸载<br>
-brew uninstall xxx</p>
-<p>#查询<br>
-brew info xxx 查看具体的信息及依赖关系当前版本注意事项等</p>
-<p>#更新<br>
-brew update</p>
-<p>#检测新版本<br>
-brew outdated 会列出所有有新版本的程序</p>
-<p>#升级<br>
-brew upgrade 升级所有 当然也可以指定升级<br>
+<h1 id="安装">安装</h1>
+<p>brew install xxx</p>
+<h1 id="卸载">卸载</h1>
+<p>brew uninstall xxx</p>
+<h1 id="查询">查询</h1>
+<p>brew info xxx 查看具体的信息及依赖关系当前版本注意事项等</p>
+<h1 id="更新">更新</h1>
+<p>brew update</p>
+<h1 id="检测新版本">检测新版本</h1>
+<p>brew outdated 会列出所有有新版本的程序</p>
+<h1 id="升级">升级</h1>
+<p>brew upgrade 升级所有 当然也可以指定升级<br>
 brew upgrade xxx指定的升级的程序名</p>
-<p>#清理<br>
-brew cleanup 清理不需要的版本及其安装缓存</p>
-<p>#服务停止/启动<br>
-服务.server stop/start</p>
-<p>#更多命令详见<br>
-man brew</p>
+<h1 id="清理">清理</h1>
+<p>brew cleanup 清理不需要的版本及其安装缓存</p>
+<h1 id="服务停止启动">服务停止/启动</h1>
+<p>服务.server stop/start</p>
+<h1 id="更多命令详见">更多命令详见</h1>
+<p>man brew</p>
 ]]></content>
     </entry>
     <entry>
