@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://qingkanc.github.io</id>
+    <title>青栞</title>
+    <updated>2022-06-24T02:45:30.176Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://qingkanc.github.io"/>
+    <link rel="self" href="https://qingkanc.github.io/atom.xml"/>
+    <subtitle>温故而知新</subtitle>
+    <logo>https://qingkanc.github.io/images/avatar.png</logo>
+    <icon>https://qingkanc.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, 青栞</rights>
+    <entry>
+        <title type="html"><![CDATA[Activiti节点自定义属性获取]]></title>
+        <id>https://qingkanc.github.io/activiti-jie-dian-zi-ding-yi-shu-xing-huo-qu/</id>
+        <link href="https://qingkanc.github.io/activiti-jie-dian-zi-ding-yi-shu-xing-huo-qu/">
+        </link>
+        <updated>2022-06-24T02:22:56.000Z</updated>
+        <content type="html"><![CDATA[<pre><code class="language-java">ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processId).singleResult();
+ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(pi.getProcessDefinitionId());
+BpmnModel bm = repositoryService.getBpmnModel(pdEntity.getId());
+org.activiti.bpmn.model.Process process = bm.getProcesses().get(0);
+Collection&lt;FlowElement&gt; flowElements = process.getFlowElements();
+Map&lt;String, List&lt;ExtensionElement&gt;&gt; extensionElements;
+for (FlowElement flowElement : flowElements) {
+    if (flowElement instanceof UserTask) {
+        UserTask userTask = (UserTask) flowElement;
+        // extensionElements所有自定义节点信息
+        extensionElements = userTask.getExtensionElements();
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[RestHighLevelClient查询es]]></title>
+        <id>https://qingkanc.github.io/resthighlevelclient-cha-xun-es/</id>
+        <link href="https://qingkanc.github.io/resthighlevelclient-cha-xun-es/">
+        </link>
+        <updated>2022-06-21T09:23:58.000Z</updated>
+        <content type="html"><![CDATA[<!-- more -->
+<p>elasticsearch 的java驱动中，提供了许多查询尔对构造方式，如下：</p>
+<pre><code>org.elasticsearch.index.query.QueryBuilders
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>queryName</th>
+<th>说明</th>
+<th>关键词分词</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>matchAllQuery</td>
+<td>查询所有</td>
+<td></td>
+</tr>
+<tr>
+<td>matchQuery</td>
+<td></td>
+<td>分词</td>
+</tr>
+<tr>
+<td>multiMatchQuery</td>
+<td></td>
+<td>分词</td>
+</tr>
+<tr>
+<td>matchPhraseQuery</td>
+<td></td>
+<td>不</td>
+</tr>
+<tr>
+<td>matchPhrasePrefixQuery</td>
+<td></td>
+<td>不</td>
+</tr>
+<tr>
+<td>idsQuery</td>
+<td>根据_id查询文档</td>
+<td></td>
+</tr>
+<tr>
+<td>termQuery</td>
+<td>匹配term</td>
+<td>不</td>
+</tr>
+<tr>
+<td>termsQuery</td>
+<td>匹配任何一个term</td>
+<td>不</td>
+</tr>
+<tr>
+<td>fuzzyQuery</td>
+<td>模糊，相似(自动判断)</td>
+<td></td>
+</tr>
+<tr>
+<td>prefixQuery</td>
+<td>start with</td>
+<td></td>
+</tr>
+<tr>
+<td>rangeQuery</td>
+<td>范围（gt、lt、gte、lte）</td>
+<td></td>
+</tr>
+<tr>
+<td>wildcardQuery</td>
+<td>模糊（*匹配任意、?匹配单个字符）</td>
+<td></td>
+</tr>
+<tr>
+<td>regexpQuery</td>
+<td>k.*y 匹配 ky、key</td>
+<td></td>
+</tr>
+<tr>
+<td>queryStringQuery</td>
+<td>编写query_string（不推荐）</td>
+<td></td>
+</tr>
+<tr>
+<td>simpleQueryStringQuery</td>
+<td>编写query_string</td>
+<td></td>
+</tr>
+<tr>
+<td>existsQuery</td>
+<td>存在某个字段</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Term查询不会对字段进行分词查询，会采用精确匹配。<br>
+Match会根据该字段的分词器，进行分词查询。<br>
+es中有以上常用的查询，bool查询就是使用must、should、must_not组合以上各个查询的查询方式。</p>
+</blockquote>
+<h1 id="resthighlevelclient查询es示例">RestHighLevelClient查询es示例</h1>
+<pre><code class="language-java">  @Autowired
+     private RestHighLevelClient esClient;
+     /**
+      * 使用boolQuery查询es
+      * @param indices 索引名称
+      * @return
+      */
+     public Map&lt;String, List&lt;SearchHit&gt;&gt; esBoolQuery(String... indices) {
+         SearchRequest searchRequest = new SearchRequest(indices);
+         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+         // 建立一个bool查询
+         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+         boolQueryBuilder.must(
+                 QueryBuilders.rangeQuery(&quot;month&quot;)
+                         .gte(startMonth)
+                         .lte(endMonth) )
+                 .mustNot(QueryBuilders.matchPhraseQuery(&quot;idCardNo&quot;, idNo).boost(1.2F))
+                 .filter(QueryBuilders.fuzzyQuery(&quot;name&quot;, &quot;王&quot;))
+                 .filter(QueryBuilders.wildcardQuery(&quot;name&quot;, &quot;王*&quot;));
+         sourceBuilder.query(boolQueryBuilder);
+         // 包含字段和忽略字段
+         sourceBuilder.fetchSource(new String[]{&quot;name&quot;, &quot;age&quot;}, new String[]{&quot;id&quot;});
+         // 排序
+         sourceBuilder.sort(&quot;name&quot;, SortOrder.DESC);
+         // 分页
+         sourceBuilder.from(0);
+         sourceBuilder.size(10);
+         // 聚合函数
+         sourceBuilder.aggregation(AggregationBuilders.sum(&quot;age&quot;));
+         // 高亮
+         HighlightBuilder highlightBuilder = new HighlightBuilder();
+         highlightBuilder.preTags(&quot;&lt;span class=\&quot;highlight\&quot;&gt;&quot;);
+         highlightBuilder.postTags(&quot;&lt;/span&gt;&quot;);
+         highlightBuilder.fields().add(new HighlightBuilder.Field(&quot;name&quot;));
+         sourceBuilder.highlighter(highlightBuilder);
+ ​
+         searchRequest.source(sourceBuilder);
+         // 查询
+         SearchResponse response;
+         try {
+             response = esClient.search(searchRequest, RequestOptions.DEFAULT);
+         } catch (IOException e) {
+             LOGGER.error(&quot;es查询失败！&quot;, e);
+             return null;
+         }
+         // 处理查询结果
+         SearchHits hits = response.getHits();
+ ​
+         return Arrays.stream(hits.getHits()).collect(Collectors.groupingBy(SearchHit::getIndex));
+     }
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[nginx常用命令]]></title>
+        <id>https://qingkanc.github.io/nginx-chang-yong-ming-ling/</id>
+        <link href="https://qingkanc.github.io/nginx-chang-yong-ming-ling/">
+        </link>
+        <updated>2022-03-28T07:03:51.000Z</updated>
+        <content type="html"><![CDATA[<pre><code>start nginx : 启动nginx 
+nginx -s reload ：修改配置后重新加载生效 
+nginx -s reopen ：重新打开日志文件 
+nginx -t -c /path/to/nginx.conf 测试nginx配置文件是否正确 
+
+关闭nginx： 
+nginx -s stop :快速停止nginx 
+nginx -s quit ：完整有序的停止nginx</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Homebrew常用命令]]></title>
+        <id>https://qingkanc.github.io/homebrew-chang-yong-ming-ling/</id>
+        <link href="https://qingkanc.github.io/homebrew-chang-yong-ming-ling/">
+        </link>
+        <updated>2021-03-26T05:49:14.000Z</updated>
+        <content type="html"><![CDATA[<!-- more -->
+<p>API</p>
+<ul>
+<li>
+<p>搜索<br>
+brew search xxx</p>
+</li>
+<li>
+<p>安装<br>
+brew install xxx</p>
+</li>
+<li>
+<p>卸载<br>
+brew uninstall xxx</p>
+</li>
+<li>
+<p>查询<br>
+brew info xxx 查看具体的信息及依赖关系当前版本注意事项等</p>
+</li>
+<li>
+<p>更新<br>
+brew update</p>
+</li>
+<li>
+<p>检测新版本<br>
+brew outdated 会列出所有有新版本的程序</p>
+</li>
+<li>
+<p>升级<br>
+brew upgrade 升级所有 当然也可以指定升级<br>
+brew upgrade xxx指定的升级的程序名</p>
+</li>
+<li>
+<p>清理<br>
+brew cleanup 清理不需要的版本及其安装缓存</p>
+</li>
+<li>
+<p>服务停止/启动<br>
+服务.server stop/start</p>
+</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Multipartfile与File类型相互转换]]></title>
+        <id>https://qingkanc.github.io/multipartfile-yu-file-lei-xing-xiang-hu-zhuan-huan/</id>
+        <link href="https://qingkanc.github.io/multipartfile-yu-file-lei-xing-xiang-hu-zhuan-huan/">
+        </link>
+        <updated>2021-03-22T10:14:13.000Z</updated>
+        <content type="html"><![CDATA[<p><strong>1、Multipartfile转File</strong></p>
+<pre><code>File file = new File(path); 
+FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);  
+</code></pre>
+<p><strong>File转Multipartfile</strong></p>
+<pre><code>File file = new File(&quot;src/test/resources/input.txt&quot;);
+FileInputStream input = new FileInputStream(file);
+MultipartFile multipartFile =new MockMultipartFile(&quot;file&quot;, file.getName(), &quot;text/plain&quot;, IOUtils.toByteArray(input));
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ElasticSearch搜索1w条后数据]]></title>
+        <id>https://qingkanc.github.io/elasticsearch-sou-suo-1w-tiao-hou-shu-ju/</id>
+        <link href="https://qingkanc.github.io/elasticsearch-sou-suo-1w-tiao-hou-shu-ju/">
+        </link>
+        <updated>2021-03-22T10:06:07.000Z</updated>
+        <content type="html"><![CDATA[<!-- more -->
+<p><strong>ES报错Result window is too large, from + size must be less than or equal to: [10000]</strong></p>
+<!-- more -->
+<p><strong>_all/_settings?preserve_existing=true</strong></p>
+<pre><code>{
+   &quot;max_result_window&quot; : &quot;2000000000&quot;
+}
+</code></pre>
+<p>使用put方法执行<br>
+<img src="https://z3.ax1x.com/2021/03/26/6jDrrD.png" alt="图片" loading="lazy"></p>
+]]></content>
+    </entry>
+</feed>

@@ -1,0 +1,432 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>RestHighLevelClient查询es | 青栞</title>
+
+<link rel="shortcut icon" href="https://qingkanc.github.io/favicon.ico?v=1656038713136">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://qingkanc.github.io/styles/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0b2b6f460dfc2fe3cb72729fe340b01d";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BQ35SV57H2"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-BQ35SV57H2');
+</script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <style>
+    /* 导航栏样式 */
+    .navbar {
+        position: relative;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-brand {
+        display: inline-block;
+        padding-top: 0.3125rem;
+        padding-bottom: 0.3125rem;
+        margin-right: 1rem;
+        font-size: 1.25rem;
+        line-height: inherit;
+        white-space: nowrap;
+    }
+
+    .navbar-brand:hover,
+    .navbar-brand:focus {
+        text-decoration: none;
+    }
+
+    .navbar-nav {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        padding-left: 0;
+        margin-bottom: 0;
+        list-style: none;
+    }
+
+    .navbar-collapse {
+        -ms-flex-preferred-size: 100%;
+        flex-basis: 100%;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        -ms-flex-align: center;
+        align-items: center;
+    }
+
+    .navbar-toggler {
+        padding: 0.25rem 0.75rem;
+        font-size: 1.25rem;
+        line-height: 1;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .navbar-toggler:hover,
+    .navbar-toggler:focus {
+        text-decoration: none;
+    }
+
+    @media (min-width: 992px) {
+        .navbar-expand-lg {
+            -ms-flex-flow: row nowrap;
+            flex-flow: row nowrap;
+            -ms-flex-pack: start;
+            justify-content: flex-start;
+        }
+
+        .navbar-expand-lg .navbar-nav {
+            -ms-flex-direction: row;
+            flex-direction: row;
+        }
+
+        .navbar-expand-lg .navbar-collapse {
+            display: -ms-flexbox !important;
+            display: flex !important;
+            -ms-flex-preferred-size: auto;
+            flex-basis: auto;
+        }
+
+        .navbar-expand-lg .navbar-toggler {
+            display: none;
+        }
+    }
+
+    @media (max-width: 991px) {
+        #navbarSupportedContent {
+            display: none;
+        }
+    }
+</style>
+<nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            青栞
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1656038713136"
+                action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = function () {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    RestHighLevelClient查询es
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2022-06-21 ·
+                    </time>
+                    
+                        <a href="https://qingkanc.github.io/tphAx0cH2/" class="post-tags">
+                            # ElasticSearch
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <!-- more -->
+<p>elasticsearch 的java驱动中，提供了许多查询尔对构造方式，如下：</p>
+<pre><code>org.elasticsearch.index.query.QueryBuilders
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>queryName</th>
+<th>说明</th>
+<th>关键词分词</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>matchAllQuery</td>
+<td>查询所有</td>
+<td></td>
+</tr>
+<tr>
+<td>matchQuery</td>
+<td></td>
+<td>分词</td>
+</tr>
+<tr>
+<td>multiMatchQuery</td>
+<td></td>
+<td>分词</td>
+</tr>
+<tr>
+<td>matchPhraseQuery</td>
+<td></td>
+<td>不</td>
+</tr>
+<tr>
+<td>matchPhrasePrefixQuery</td>
+<td></td>
+<td>不</td>
+</tr>
+<tr>
+<td>idsQuery</td>
+<td>根据_id查询文档</td>
+<td></td>
+</tr>
+<tr>
+<td>termQuery</td>
+<td>匹配term</td>
+<td>不</td>
+</tr>
+<tr>
+<td>termsQuery</td>
+<td>匹配任何一个term</td>
+<td>不</td>
+</tr>
+<tr>
+<td>fuzzyQuery</td>
+<td>模糊，相似(自动判断)</td>
+<td></td>
+</tr>
+<tr>
+<td>prefixQuery</td>
+<td>start with</td>
+<td></td>
+</tr>
+<tr>
+<td>rangeQuery</td>
+<td>范围（gt、lt、gte、lte）</td>
+<td></td>
+</tr>
+<tr>
+<td>wildcardQuery</td>
+<td>模糊（*匹配任意、?匹配单个字符）</td>
+<td></td>
+</tr>
+<tr>
+<td>regexpQuery</td>
+<td>k.*y 匹配 ky、key</td>
+<td></td>
+</tr>
+<tr>
+<td>queryStringQuery</td>
+<td>编写query_string（不推荐）</td>
+<td></td>
+</tr>
+<tr>
+<td>simpleQueryStringQuery</td>
+<td>编写query_string</td>
+<td></td>
+</tr>
+<tr>
+<td>existsQuery</td>
+<td>存在某个字段</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Term查询不会对字段进行分词查询，会采用精确匹配。<br>
+Match会根据该字段的分词器，进行分词查询。<br>
+es中有以上常用的查询，bool查询就是使用must、should、must_not组合以上各个查询的查询方式。</p>
+</blockquote>
+<h1 id="resthighlevelclient查询es示例">RestHighLevelClient查询es示例</h1>
+<pre><code class="language-java">  @Autowired
+     private RestHighLevelClient esClient;
+     /**
+      * 使用boolQuery查询es
+      * @param indices 索引名称
+      * @return
+      */
+     public Map&lt;String, List&lt;SearchHit&gt;&gt; esBoolQuery(String... indices) {
+         SearchRequest searchRequest = new SearchRequest(indices);
+         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+         // 建立一个bool查询
+         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+         boolQueryBuilder.must(
+                 QueryBuilders.rangeQuery(&quot;month&quot;)
+                         .gte(startMonth)
+                         .lte(endMonth) )
+                 .mustNot(QueryBuilders.matchPhraseQuery(&quot;idCardNo&quot;, idNo).boost(1.2F))
+                 .filter(QueryBuilders.fuzzyQuery(&quot;name&quot;, &quot;王&quot;))
+                 .filter(QueryBuilders.wildcardQuery(&quot;name&quot;, &quot;王*&quot;));
+         sourceBuilder.query(boolQueryBuilder);
+         // 包含字段和忽略字段
+         sourceBuilder.fetchSource(new String[]{&quot;name&quot;, &quot;age&quot;}, new String[]{&quot;id&quot;});
+         // 排序
+         sourceBuilder.sort(&quot;name&quot;, SortOrder.DESC);
+         // 分页
+         sourceBuilder.from(0);
+         sourceBuilder.size(10);
+         // 聚合函数
+         sourceBuilder.aggregation(AggregationBuilders.sum(&quot;age&quot;));
+         // 高亮
+         HighlightBuilder highlightBuilder = new HighlightBuilder();
+         highlightBuilder.preTags(&quot;&lt;span class=\&quot;highlight\&quot;&gt;&quot;);
+         highlightBuilder.postTags(&quot;&lt;/span&gt;&quot;);
+         highlightBuilder.fields().add(new HighlightBuilder.Field(&quot;name&quot;));
+         sourceBuilder.highlighter(highlightBuilder);
+ ​
+         searchRequest.source(sourceBuilder);
+         // 查询
+         SearchResponse response;
+         try {
+             response = esClient.search(searchRequest, RequestOptions.DEFAULT);
+         } catch (IOException e) {
+             LOGGER.error(&quot;es查询失败！&quot;, e);
+             return null;
+         }
+         // 处理查询结果
+         SearchHits hits = response.getHits();
+ ​
+         return Arrays.stream(hits.getHits()).collect(Collectors.groupingBy(SearchHit::getIndex));
+     }
+</code></pre>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://qingkanc.github.io/nginx-chang-yong-ming-ling/" class="post-title gt-a-link">
+                    nginx常用命令
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">温故而知新</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/qingkanc/qingkanc.github.io" target="_blank">青栞</a> | © 2021
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>
